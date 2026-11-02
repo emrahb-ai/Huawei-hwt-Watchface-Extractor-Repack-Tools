@@ -2,6 +2,16 @@
 
 Python utilities to extract and repack Huawei `.hwt` watchface archives using Windows drag-and-drop.
 
+## Windows standalone app (EXE)
+
+The Windows GUI offers **Extract HWT** and **Repack folder** in one executable. Python/Pillow are bundled into the compiled EXE.
+
+**Download/build:** Open [GitHub Actions](https://github.com/emrahb-ai/Huawei-hwt-Watchface-Extractor-Repack-Tools/actions/workflows/windows-exe.yml), choose **Run workflow**, wait until the run finishes successfully, then download the artifact **Huawei-HWT-Tools-Windows-x64** and unzip it to get `Huawei-HWT-Tools.exe`. Automatic builds also run when GUI/extractor/repacker code changes.
+
+**Usage:** Select an HWT file to Extract; edit PNG files in the resulting same-named folder without resizing; then select that folder for Repack. The original HWT must remain beside the folder. Dragging an HWT file or working folder onto the EXE icon is supported too.
+
+**Validation status:** The extractor has been tried on Windows by the project owner. The repacker and the compiled Windows EXE still require end-to-end tests on Windows and an actual Huawei watch. Do not overwrite your original watchface.
+
 ## Features
 - Drag an `.hwt` file onto `extract_huawei_watchface.py`: extracts archive contents to a same-named folder and converts compatible `com.huawei.watchface` BGRA/RLE images to PNGs.
 - Edit extracted PNG images without changing their dimensions.
