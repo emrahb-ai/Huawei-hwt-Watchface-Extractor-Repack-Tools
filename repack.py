@@ -66,7 +66,7 @@ def encode(img):
         raise ValueError("Encoder verification failed")
     return result
 
-def rebuild(original, png_dir):
+def rebuild(original, png_dir, layout_override=None):
     if len(original) < 24:
         raise ValueError("Truncated container")
     version, layout_len, map_len, length_field, unknown = struct.unpack_from("<HHIII", original)
@@ -103,7 +103,13 @@ def rebuild(original, png_dir):
     for blob in records:
         new_table.extend(struct.pack("<II", len(new_body)+8,len(blob)))
         new_body.extend(blob)
-    header = bytearray(original[:16+layout_len])
+    # Preserve layout by default, but allow a protobuf editor to update coordinates.
+    original_layout = original[16:16+layout_len]
+    layout = original_layout if layout_override is None else layout_override
+    if not 0 <= len(layout) <= 65535:
+        raise ValueError("Layout protobuf is too large")
+    header = bytearray(original[:16]) + layout
+    struct.pack_into("<H", header, 2, len(layout))
     struct.pack_into("<I",header,8,len(new_body)+8)
     output = bytes(header) + bytes(new_table) + original[body_start-8:body_start] + bytes(new_body)
     if len(output) < body_start:
@@ -140,7 +146,9 @@ def repack_folder(folder_path):
             raise ValueError("Expected exactly one com.huawei.watchface")
         watchface_name = watchface_names[0]
         original = archive.read(watchface_name)
-    rebuilt, changed = rebuild(original,png_dir)
+    layout_file = png_dir / "layout.protobuf"
+    layout_override = layout_file.read_bytes() if layout_file.is_file() else None
+    rebuilt, changed = rebuild(original,png_dir,layout_override)
     buffer = io.BytesIO()
     changed_members = []
     with zipfile.ZipFile(source_hwt) as archive, zipfile.ZipFile(buffer,"w") as result:
