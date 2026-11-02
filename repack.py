@@ -89,9 +89,12 @@ def rebuild(original, png_dir):
             original_img = decode(blob)
             with Image.open(png) as image:
                 edited_img = image.convert("RGBA")
-            if edited_img.size != original_img.size:
-                raise ValueError(f"image_{index:03d}.png dimensions changed")
-            if edited_img.tobytes() != original_img.tobytes():
+            # Image dimensions are encoded within each image record. A resized
+            # PNG is valid for this container, but the existing layout.protobuf
+            # still refers to its original layout/positions and is not rewritten.
+            if edited_img.size != original_img.size or edited_img.tobytes() != original_img.tobytes():
+                if edited_img.size != original_img.size:
+                    print(f"WARNING image_{index:03d}: resized {original_img.size} -> {edited_img.size}; layout.protobuf has not been adjusted.")
                 blob = encode(edited_img)
                 edited.append(index)
         records.append(blob)
