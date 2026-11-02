@@ -52,3 +52,20 @@ Do not commit proprietary watchfaces, copyrighted assets, or personal files.
 The repacker supports both changed PNG file size (KB) and changed PNG pixel dimensions (width × height). It re-encodes the edited PNG in the watchface BGRA/RLE format and rebuilds the image-record offsets and lengths. **Important:** `layout.protobuf` is preserved, not recalculated. Images that are larger or smaller might be incorrectly placed or clipped on the watch. Device compatibility is not yet confirmed.
 
 Repacker, PNG görsellerinin hem dosya boyutunun hem de piksel genişlik/yüksekliğinin değişmesini kabul eder. Fakat `layout.protobuf` içindeki yerleşim koordinatları otomatik güncellenmez. Saat ekranında konum/kırpılma sorunu oluşabilir.
+
+## Experimental layout coordinates editor
+
+Huawei watchface positions can be stored in `layout.protobuf`. This project's **experimental** editor recognizes 11 bounding boxes in the tested HWT file. These boxes look like x/y/width/height fields, but their meanings and association with individual PNGs have **not** been fully verified.
+
+```powershell
+py hwt_layout_editor.py inspect "path\\to\\extracted_folder"
+```
+
+Edit `watchface_extracted/layout_boxes.json` (x/y/width/height only), then:
+
+```powershell
+py hwt_layout_editor.py apply "path\\to\\extracted_folder"
+```
+
+The original layout is backed up and `repack.py` now embeds the modified `layout.protobuf` in the rebuilt `.hwt`. **Important:** This does not automatically match resized day-of-week image assets to their widgets; test alignment and clipping before using on a watch. Start with small coordinate adjustments and keep the original HWT. The graphical app does not yet provide visual coordinate editing.
+
