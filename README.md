@@ -8,13 +8,13 @@ The Windows GUI offers **Extract HWT** and **Repack folder** in one executable. 
 
 **Download/build:** Open [GitHub Actions](https://github.com/emrahb-ai/Huawei-hwt-Watchface-Extractor-Repack-Tools/actions/workflows/windows-exe.yml), choose **Run workflow**, wait until the run finishes successfully, then download the artifact **Huawei-HWT-Tools-Windows-x64** and unzip it to get `Huawei-HWT-Tools.exe`. Automatic builds also run when GUI/extractor/repacker code changes.
 
-**Usage:** Select an HWT file to Extract; edit PNG files in the resulting same-named folder without resizing; then select that folder for Repack. The original HWT must remain beside the folder. Dragging an HWT file or working folder onto the EXE icon is supported too.
+**Usage:** Select an HWT file to Extract; edit PNG files in the resulting same-named folder (resizing is supported in image records; layout positions are not automatically updated); then select that folder for Repack. The original HWT must remain beside the folder. Dragging an HWT file or working folder onto the EXE icon is supported too.
 
 **Validation status:** The extractor has been tried on Windows by the project owner. The repacker and the compiled Windows EXE still require end-to-end tests on Windows and an actual Huawei watch. Do not overwrite your original watchface.
 
 ## Features
 - Drag an `.hwt` file onto `extract_huawei_watchface.py`: extracts archive contents to a same-named folder and converts compatible `com.huawei.watchface` BGRA/RLE images to PNGs.
-- Edit extracted PNG images without changing their dimensions.
+- Edit extracted PNG images including their pixel dimensions (layout may need manual adjustment).
 - Drag the extracted folder onto `repack.py`: builds `com.huawei.watchface_repack` and `<original>_repack.hwt`.
 - Preserves unknown image records and unmodified image data.
 - Supports edits to extracted preview files and `description.xml`.
@@ -47,3 +47,8 @@ The extractor avoids overwriting existing folders; the repacker avoids overwriti
 Supported image format: the Huawei BGRA/RLE records observed in the tested watchface. Other records are preserved rather than decoded. Rebuilding an archive does **not** guarantee installation through Huawei Health or compatibility with all watch models. Huawei trademarks belong to their respective owners. This is an independent community tool.
 
 Do not commit proprietary watchfaces, copyrighted assets, or personal files.
+## Resizing PNG images / Görsel ölçülerini değiştirme
+
+The repacker supports both changed PNG file size (KB) and changed PNG pixel dimensions (width × height). It re-encodes the edited PNG in the watchface BGRA/RLE format and rebuilds the image-record offsets and lengths. **Important:** `layout.protobuf` is preserved, not recalculated. Images that are larger or smaller might be incorrectly placed or clipped on the watch. Device compatibility is not yet confirmed.
+
+Repacker, PNG görsellerinin hem dosya boyutunun hem de piksel genişlik/yüksekliğinin değişmesini kabul eder. Fakat `layout.protobuf` içindeki yerleşim koordinatları otomatik güncellenmez. Saat ekranında konum/kırpılma sorunu oluşabilir.
